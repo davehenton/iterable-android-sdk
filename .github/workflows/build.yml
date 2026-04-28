@@ -46,28 +46,17 @@ jobs:
       - run: touch local.properties
 
       - name: Test
-        run: ./gradlew :iterableapi:testDebugUnitTest :app:jacocoDebugTestReport
-
-      - name: Debug coverage report
-        run: |
-          REPORT=app/build/reports/jacoco/jacocoDebugTestReport/jacocoDebugTestReport.xml
-          echo "Size: $(wc -c < $REPORT)"
-          echo "--- First package elements ---"
-          grep -E '<package |<sourcefile ' $REPORT | head -30
-          echo "--- JACOCO_SOURCE_PATH ---"
-          echo "$JACOCO_SOURCE_PATH"
-        env:
-          JACOCO_SOURCE_PATH: "iterableapi/src/main/java iterableapi-ui/src/main/java app/src/main/java"
+        run: ./gradlew :iterableapi:createDebugUnitTestCoverageReport :app:testDebugUnitTest
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2
         env:
-          JACOCO_SOURCE_PATH: "iterableapi/src/main/java iterableapi-ui/src/main/java app/src/main/java"
+          JACOCO_SOURCE_PATH: "iterableapi/src/main/java"
         with:
           oidc: false
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           format: jacoco
-          files: app/build/reports/jacoco/jacocoDebugTestReport/jacocoDebugTestReport.xml
+          files: iterableapi/build/reports/coverage/test/debug/report.xml
 
   instrumentation-tests:
     name: Instrumentation tests
