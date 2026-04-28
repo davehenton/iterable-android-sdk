@@ -46,17 +46,17 @@ jobs:
       - run: touch local.properties
 
       - name: Test
-      # run: ./gradlew :iterableapi:jacocoTestDebugUnitTestReport :app:jacocoDebugTestReport  
-        run: ./gradlew :iterableapi:testDebugUnitTest :app:testDebugUnitTest
+        run: ./gradlew :iterableapi:createDebugUnitTestCoverageReport :app:testDebugUnitTest
 
-      # Coverage reporting temporarily disabled
-      # - name: Upload coverage data
-      #   uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-      #   with:
-      #     name: unit-tests
-      #     path: |
-      #       ./**/build/**/jacoco*.xml
-      #       ./**/build/**/report.xml
+      - name: Upload coverage to Qlty
+        uses: qltysh/qlty-action/coverage@v2
+        env:
+          JACOCO_SOURCE_PATH: "iterableapi/src/main/java"
+        with:
+          oidc: false
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          format: jacoco
+          files: iterableapi/build/reports/coverage/test/debug/report.xml
 
   instrumentation-tests:
     name: Instrumentation tests
